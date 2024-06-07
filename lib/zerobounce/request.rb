@@ -22,6 +22,7 @@ module Zerobounce
     attr_reader :headers
     attr_reader :middleware
     attr_reader :api_version
+    attr_reader :timeout
 
     # Set instance variables and extends the correct Zerobounce::Request
     #
@@ -30,11 +31,13 @@ module Zerobounce
     # @option params [String] :headers default: {Configuration#headers} {include:#headers}
     # @option params [String] :host default: {Configuration#host} {include:#host}
     # @option params [String] :api_version default: {Configuration#api_version} {include:#api_version}
+    # @option params [Integer] :timeout default: {Configuration#timeout} {include:#timeout}
     def initialize(params={})
       @middleware = params[:middleware] || Zerobounce.config.middleware
       @headers = params[:headers] || Zerobounce.config.headers
       @host = params[:host] || Zerobounce.config.host
       @api_version = params[:api_version] || Zerobounce.config.api_version
+      @timeout = params[:timeout] || Zerobounce.config.timeout
 
       case api_version
       when 'v2'
@@ -66,7 +69,8 @@ module Zerobounce
 
     # @return [Faraday::Connection]
     def conn
-      @conn ||= Faraday.new("#{host}/#{api_version}", headers: headers, &middleware)
+      request_opts = { timeout: @timeout }
+      @conn ||= Faraday.new("#{host}/#{api_version}", headers: headers, request: request_opts, &middleware)
     end
   end
 end

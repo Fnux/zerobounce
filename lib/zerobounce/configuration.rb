@@ -28,6 +28,8 @@ module Zerobounce
   #
   # @attr [Array<Symbol>] valid_statues
   #   The statuses that are considered valid by {Response#valid?}.
+  # @attr [Integer] timeout
+  #   The max number of seconds to wait for the request to complete.
   class Configuration
     attr_accessor :host
     attr_accessor :headers
@@ -35,6 +37,7 @@ module Zerobounce
     attr_accessor :middleware
     attr_accessor :api_version
     attr_accessor :valid_statuses
+    attr_accessor :timeout
 
     def initialize
       self.host = 'https://api.zerobounce.net'
@@ -42,6 +45,7 @@ module Zerobounce
       self.api_version = 'v2'
       self.valid_statuses = %i[valid catch_all]
       self.headers = { user_agent: "ZerobounceRubyGem/#{Zerobounce::VERSION}" }
+      self.timeout = nil
 
       self.middleware = proc do |builder|
         builder.response(:json, content_type: /\bjson$/, parser_options: { symbolize_names: true })
